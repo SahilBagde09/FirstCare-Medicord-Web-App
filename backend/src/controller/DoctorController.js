@@ -40,8 +40,8 @@ export const registerDoctor = (request, response)=>{
 
 // Doctor Login
 export const doctorLogin = (request, response)=>{
-    const{UserID, Password} = request.body;
-    const qry_doctorExists = `Select * from ${DOCTORS_TABLE_NAME} where UserID = '${UserID}'`;
+    const{userId, password} = request.body;
+    const qry_doctorExists = `Select * from ${DOCTORS_TABLE_NAME} where UserID = '${userId}'`;
     connection.query(qry_doctorExists, (error, result)=>{
         if(error){
             console.error('Error querying database: ', err);
@@ -49,13 +49,13 @@ export const doctorLogin = (request, response)=>{
         }
         else{
             if(result.length === 0){
-                console.log(`Invalid User Name or doctor ${UserID} is not registered`);
-                response.status(400).send({message: `Invalid User Name or doctor ${UserID} is not registered`});
+                console.log(`Invalid User Name or doctor ${userId} is not registered`);
+                response.status(400).send({message: `Invalid User Name or doctor ${userId} is not registered`});
             }
             else{
                 const userDocter = result[0];
                 const encryptedPassword = userDocter.Password;
-                if(compareSync(Password, encryptedPassword)){
+                if(compareSync(password, encryptedPassword)){
                     const token = jwt.sign({UserID: userDocter.UserID}, 'DhoomDhadam');
                     response.status(200).send(
                         {
@@ -65,7 +65,7 @@ export const doctorLogin = (request, response)=>{
                     );
                 }
                 else{
-                    console.log(`Invalid Password or doctor ${UserID}`);
+                    console.log(`Invalid Password of doctor ${userId}`);
                     response.status(400).send({message: `Invalid Password`});
                 }
             }
